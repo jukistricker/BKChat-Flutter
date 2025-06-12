@@ -3,6 +3,9 @@ import 'package:untitled/core/constants/constants.dart';
 import 'package:untitled/features/auth/presentation/pages/register_page.dart';
 import 'package:untitled/features/auth/presentation/view_models/login_view_model.dart';
 import 'package:provider/provider.dart';
+import 'package:untitled/features/chat/presentation/pages/chat_page.dart';
+
+import '../../../home/presentaion/pages/home_page.dart';
 
 class LoginPage extends StatelessWidget {
   static route() => MaterialPageRoute(
@@ -156,6 +159,7 @@ class LoginPage extends StatelessWidget {
                       SnackBar(content: Text(Constants.loginSuccess)),
                     );
                     // Có thể chuyển sang HomePage ở đây nếu muốn
+                    Navigator.push(context, ChatPage.route());
                   }
                 },
                 child: Container(
