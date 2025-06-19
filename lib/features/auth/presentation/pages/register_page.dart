@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:untitled/core/constants/constants.dart';
+import 'package:untitled/features/home/presentaion/pages/home_page.dart';
 import '../view_models/register_view_model.dart';
 
 class RegisterPage extends StatelessWidget {
@@ -139,6 +140,52 @@ class RegisterPage extends StatelessWidget {
 
               SizedBox(height: 12),
 
+              // Email
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Label
+                  Padding(
+                    padding: const EdgeInsets.only(left: 4.0), // căn lề như Figma
+                    child: Text(
+                      Constants.email,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+
+                  // Input Text
+                  TextField(
+                    onChanged: (value) => viewModel.setEmail(value),
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      border: UnderlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Color(0xffcdd1d0),
+                          width: 1,
+                        ),
+                      ),
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Color(0xffcdd1d0),
+                          width: 1,
+                        ),
+                      ),
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Color(0xff6783e7),
+                          width: 2,
+                        ),
+                      ),
+                      contentPadding: EdgeInsets.symmetric(vertical: 8),
+                    ),
+                  ),
+                ],
+              ),
+
+              SizedBox(height: 12),
               // Password
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -254,13 +301,18 @@ class RegisterPage extends StatelessWidget {
               Spacer(),
               // Register button
               GestureDetector(
-                onTap: () {
-                  final success=viewModel.signUp();
+                onTap: () async {
+                  final success= await viewModel.signUp();
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(Constants.registering)),
+                  );
                   if (success) {
                     viewModel.setErrorText(null);
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text(Constants.registerSuccess)),
                     );
+                    Navigator.push(context, HomePage.route());
                     // Có thể chuyển sang HomePage ở đây nếu muốn
                   }
                 },

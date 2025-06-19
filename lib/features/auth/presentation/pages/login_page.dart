@@ -159,7 +159,7 @@ class LoginPage extends StatelessWidget {
                       SnackBar(content: Text(Constants.loginSuccess)),
                     );
                     // Có thể chuyển sang HomePage ở đây nếu muốn
-                    Navigator.push(context, ChatPage.route());
+                    Navigator.push(context, HomePage.route());
                   }
                 },
                 child: Container(

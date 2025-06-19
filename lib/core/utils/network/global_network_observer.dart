@@ -2,7 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:untitled/utils/network/view_models/connectivity_view_model.dart';
+import 'package:untitled/core/utils/network/view_models/connectivity_view_model.dart';
+
 
 import 'network_error_popup.dart';
 
