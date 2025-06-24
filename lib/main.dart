@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:realm/realm.dart';
 import 'package:untitled/core/utils/network/global_network_observer.dart';
 import 'package:untitled/core/utils/network/view_models/connectivity_view_model.dart';
 import 'package:untitled/features/auth/presentation/pages/login_page.dart';
 import 'package:untitled/features/auth/presentation/view_models/login_view_model.dart';
 import 'package:untitled/features/auth/presentation/view_models/register_view_model.dart';
 
+import 'domain/models/user/user.dart';
+
 
 
 
 void main() {
+
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
     statusBarBrightness: Brightness.light, // nền sáng
     statusBarIconBrightness: Brightness.dark, // icon màu tối

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:untitled/core/constants/constants.dart';
 import 'package:untitled/features/home/presentaion/pages/home_page.dart';
+import '../../../../core/utils/realm_service.dart';
 import '../view_models/register_view_model.dart';
 
 class RegisterPage extends StatelessWidget {
@@ -302,7 +303,8 @@ class RegisterPage extends StatelessWidget {
               // Register button
               GestureDetector(
                 onTap: () async {
-                  final success= await viewModel.signUp();
+                  final realm = RealmService().realm;
+                  final success = await viewModel.signUp(realm);
 
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text(Constants.registering)),

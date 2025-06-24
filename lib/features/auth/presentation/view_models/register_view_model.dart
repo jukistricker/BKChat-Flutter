@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:realm/realm.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
 import 'package:untitled/features/auth/data/req/RegisterRequest.dart';
+
+import '../../../../domain/models/user/user.dart';
 
 class RegisterViewModel extends ChangeNotifier {
   // String displayName = '';
@@ -45,7 +48,7 @@ class RegisterViewModel extends ChangeNotifier {
   }
 
 
-  Future<bool> signUp() async {
+  Future<bool> signUp(Realm realm) async {
     if (!_request.isValid()) {
       setErrorText('Vui lòng nhập đầy đủ các trường!');
       return false;
@@ -61,30 +64,48 @@ class RegisterViewModel extends ChangeNotifier {
       final url = Uri.parse('http://10.2.44.52:8888/api/auth/register');
 
       try {
-        final response = await http.post(
-          url,
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode(_request.toJson()),
+
+        final user = User(
+          ObjectId() as String,         // ID kiểu Realm
+          '',                 // userId mặc định
+          _request.username,
+          _request.displayName,
+          DateTime.now(),
+          avatarPath: null,               // avatarPath
         );
 
-        final json = jsonDecode(response.body);
-        if (json['status'] == 1) {
-          final token = json['data']['token'];
-          final prefs = await SharedPreferences.getInstance();
-          await prefs.setString('auth_token', token); // ✅ Lưu token vào local
+        realm.write(() {
+          realm.add(user);
+        });
 
-          // In ra cho chắc
-          print('Saved token: $token');
-          print('Token: ${json['data']['token']}');
-          print('Username: ${json['data']['Username']}');
-          print('FullName: ${json['data']['FullName']}');
-          return true;
-        } else {
-          setErrorText(json['meessage'] ?? json['message'] ?? 'Đăng ký thất bại');
-          return false;
-        }
+        print('User saved to Realm: '+user.username);
+        return true;
+
+        // final response = await http.post(
+        //   url,
+        //   headers: {'Content-Type': 'application/json'},
+        //   body: jsonEncode(_request.toJson()),
+        // );
+        //
+        // final json = jsonDecode(response.body);
+        // if (json['status'] == 1) {
+        //   final token = json['data']['token'];
+        //   final prefs = await SharedPreferences.getInstance();
+        //   await prefs.setString('auth_token', token); // ✅ Lưu token vào local
+        //
+        //   // In ra cho chắc
+        //   print('Saved token: $token');
+        //   print('Token: ${json['data']['token']}');
+        //   print('Username: ${json['data']['Username']}');
+        //   print('FullName: ${json['data']['FullName']}');
+        //   return true;
+        // } else {
+        //   setErrorText(json['meessage'] ?? json['message'] ?? 'Đăng ký thất bại');
+        //   return false;
+        // }
       } catch (e) {
         setErrorText('Lỗi kết nối máy chủ');
+        print(e.toString());
         return false;
       }
     }
