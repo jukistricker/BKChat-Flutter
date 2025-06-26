@@ -48,3 +48,7 @@ app.*.map.json
 *.realm.dart
 # Ignore Realm generated files
 lib/domain/models/*.realm.dart
+
+.env*.local
+.env
+

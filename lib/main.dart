@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:realm/realm.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import 'package:untitled/core/utils/network/global_network_observer.dart';
 import 'package:untitled/core/utils/network/view_models/connectivity_view_model.dart';
 import 'package:untitled/features/auth/presentation/pages/login_page.dart';
@@ -9,11 +11,14 @@ import 'package:untitled/features/auth/presentation/view_models/login_view_model
 import 'package:untitled/features/auth/presentation/view_models/register_view_model.dart';
 
 import 'domain/models/user/user.dart';
+import 'features/splash_page.dart';
 
 
-
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() {
+
+  dotenv.load(fileName: '.env');
 
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
     statusBarBrightness: Brightness.light, // nền sáng
@@ -34,6 +39,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ConnectivityViewModel())
       ],
       child: MaterialApp(
+        navigatorKey: navigatorKey,
         debugShowCheckedModeBanner: false,
         title: 'Bkav Chat',
         theme: ThemeData(
@@ -41,7 +47,7 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.blue,
         ),
         home: GlobalNetworkObserver(
-          child: LoginPage(), // hoặc NavigationWrapper nếu có nhiều page
+          child: SplashPage(), // hoặc NavigationWrapper nếu có nhiều page
         ),
       ),
     );

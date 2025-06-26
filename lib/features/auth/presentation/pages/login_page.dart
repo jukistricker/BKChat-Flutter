@@ -5,6 +5,7 @@ import 'package:untitled/features/auth/presentation/view_models/login_view_model
 import 'package:provider/provider.dart';
 import 'package:untitled/features/chat/presentation/pages/chat_page.dart';
 
+import '../../../../core/services/realm_service.dart';
 import '../../../home/presentaion/pages/home_page.dart';
 
 class LoginPage extends StatelessWidget {
@@ -151,8 +152,9 @@ class LoginPage extends StatelessWidget {
               right: 24,
               height: 48,
               child: GestureDetector(
-                onTap: () {
-                  final success=viewModel.signIn();
+                onTap: () async {
+                  final realm = RealmService().realm;
+                  final success = await viewModel.signIn(realm);
                   if (success) {
                     viewModel.setErrorText(null);
                     ScaffoldMessenger.of(context).showSnackBar(

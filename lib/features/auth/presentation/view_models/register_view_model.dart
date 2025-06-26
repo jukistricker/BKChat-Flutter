@@ -3,8 +3,10 @@ import 'package:http/http.dart' as http;
 import 'package:realm/realm.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:untitled/core/config/app.config.dart';
 
-import 'package:untitled/features/auth/data/req/RegisterRequest.dart';
+import 'package:untitled/features/auth/data/req/register_request.dart';
 
 import '../../../../domain/models/user/user.dart';
 
@@ -17,10 +19,7 @@ class RegisterViewModel extends ChangeNotifier {
   final RegisterRequest _request = RegisterRequest();
   String? errorText;
 
-  void setEmail(String value){
-    _request.email = value;
-    notifyListeners();
-  }
+
 
   void setUsername(String value) {
     _request.username = value;
@@ -55,59 +54,58 @@ class RegisterViewModel extends ChangeNotifier {
     } else if (_request.username == 'admin' &&
         _request.password == '12345678' &&
         _request.password == _request.confirmPassword) {
-      setErrorText('Tài khoản đã tồn tại !');
+      setErrorText('Tài khoản đã tồn tại!');
       return false;
     } else if (!_request.isPasswordConfirmed()) {
       setErrorText('Mật khẩu không khớp!');
       return false;
     } else {
-      final url = Uri.parse('http://10.2.44.52:8888/api/auth/register');
+      final url = Uri.parse(ApiConfig.regUrl);
 
       try {
-
-        final user = User(
-          ObjectId() as String,         // ID kiểu Realm
-          '',                 // userId mặc định
-          _request.username,
-          _request.displayName,
-          DateTime.now(),
-          avatarPath: null,               // avatarPath
+        final response = await http.post(
+          url,
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode(_request.toJson()),
         );
 
-        realm.write(() {
-          realm.add(user);
-        });
+        final json = jsonDecode(response.body);
+        if (json['status'] == 1) {
+          final data = json['data'];
+          final token = data['token'];
 
-        print('User saved to Realm: '+user.username);
-        return true;
+          // ✅ Lưu token vào SharedPreferences
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('auth_token', token);
 
-        // final response = await http.post(
-        //   url,
-        //   headers: {'Content-Type': 'application/json'},
-        //   body: jsonEncode(_request.toJson()),
-        // );
-        //
-        // final json = jsonDecode(response.body);
-        // if (json['status'] == 1) {
-        //   final token = json['data']['token'];
-        //   final prefs = await SharedPreferences.getInstance();
-        //   await prefs.setString('auth_token', token); // ✅ Lưu token vào local
-        //
-        //   // In ra cho chắc
-        //   print('Saved token: $token');
-        //   print('Token: ${json['data']['token']}');
-        //   print('Username: ${json['data']['Username']}');
-        //   print('FullName: ${json['data']['FullName']}');
-        //   return true;
-        // } else {
-        //   setErrorText(json['meessage'] ?? json['message'] ?? 'Đăng ký thất bại');
-        //   return false;
-        // }
+          // ✅ Lưu user vào Realm
+          final user = User(
+            ObjectId(),
+            data['userId'] ?? '',          // hoặc '', nếu chưa có
+            data['Username'] ?? _request.username,
+            data['FullName'] ?? _request.displayName,
+            DateTime.now(),
+            avatarPath: null,
+          );
+
+          realm.write(() {
+            realm.add(user);
+          });
+
+          print('User saved to Realm: ${user.username}');
+          print('Saved token: $token');
+
+          return true;
+        } else {
+          setErrorText(json['message'] ?? 'Đăng ký thất bại');
+          return false;
+        }
       } catch (e) {
         setErrorText('Lỗi kết nối máy chủ');
-        print(e.toString());
+        print('Lỗi: ${e.toString()}');
         return false;
       }
     }
   }
+
 }

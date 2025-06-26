@@ -5,7 +5,7 @@ part 'user.realm.dart';
 @RealmModel()
 class _User {
   @PrimaryKey()
-  late String id;
+  late ObjectId id;
 
   late String userId;
 

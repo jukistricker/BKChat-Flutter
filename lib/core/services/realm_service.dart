@@ -10,10 +10,11 @@ class RealmService {
   }
 
   RealmService._internal() {
-    final config = Configuration.local([
-      User.schema,
-
-    ]);
+    final config = Configuration.local(
+      [User.schema], // 👈 danh sách schema
+      schemaVersion: 2, // 👈 thông số riêng, truyền ra ngoài
+      shouldDeleteIfMigrationNeeded: true, // 👈 truyền đúng cách
+    );
     realm = Realm(config);
   }
 }
